@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Endless Wavy Line with Advancing SVG Image and Image Background</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+    .dynamic-text {
+      position: absolute;
+      top: 5%;
+      left: 2%;
+      margin-left: 5%;
+      margin-top: 0%;
+      color: goldenrod;
+      font-size: 36px;
+      z-index: 3;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    let t = 0;
+    let rectX = 0;
+    let rectY = 0;
+    let img;
+    let shipImg;
+    let textureImg; // Variable to store the loaded texture image
+    let dynamicText;
+    let dynamicTextIndex = 0;
+    let dynamicTexts = [
+      "Whatever you're going through...",
+      "Stay calm...",
+      "Focus your mind...",
+      "Trust the process...",
+      "Never give up."
+    ];
+
+    function preload() {
+      img = loadImage('https://i0.wp.com/weezproject.com/wp-content/uploads/2020/08/Love-Sky-Wallpaper-2.jpg?ssl=1');
+      shipImg = loadImage('https://cdn11.bigcommerce.com/s-hii7479o/images/stencil/original/products/13604/31864/tug_boat__87486.1565650914.png?c=2');
+      textureImg = loadImage('https://images.unsplash.com/photo-1591708055112-34eecd0d086e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8b2NlYW4lMjB0ZXh0dXJlfGVufDB8fDB8fHww&w=1000&q=80');
+    }
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      frameRate(30);
+      dynamicText = createP(dynamicTexts[dynamicTextIndex]);
+      dynamicText.class('dynamic-text');
+      dynamicText.position(windowWidth * 0.1, windowHeight * 0.1); // Position the dynamic text using window width and height
+      setInterval(changeDynamicText, 3000);
+    }
+
+    function draw() {
+      const y = height / 1.5 + sin(t) * 30; // Calculate y-coordinate based on sine wave with reduced amplitude
+
+      // Draw the blue background
+      background(0, 0, 255);
+
+      // Set a constant size for the img
+      const imgWidth = width;
+      const imgHeight = 700; // Adjust the height as desired
+
+      // Draw the top part with the static image
+      image(img, 0, 0, imgWidth, imgHeight);
+
+      // Calculate the scaled height of the texture image to fill the remaining space at the bottom
+      const textureHeight = height - y;
+
+      // Draw the texture image to replace the bottom part and fill the remaining space
+      image(textureImg, 0, y, width, textureHeight);
+
+      // Draw the wavy line
+      stroke(255);
+      noFill();
+      beginShape();
+      vertex(0, y);
+      for (let x = 0; x <= width; x += 5) {
+        curveVertex(x, y);
+      }
+      vertex(width, y);
+      endShape();
+
+      // Update rectangle position based on the advancing x-coordinate
+      rectX += 1;
+      rectY = y - 67; // Move the rectangle 67 pixels downwards
+
+      // Draw the oval-shaped box shadow with modified values
+      fill(255, 255, 255, 106); // Set color to white with opacity
+      ellipse(rectX + 90, rectY + 75.5, -250, 15); // Draw the oval-shaped box shadow
+
+      // Draw the scaled ship image
+      const scaledWidth = 50 * 3; // Scale the width by a factor of 3
+      const scaledHeight = 25 * 3; // Scale the height by a factor of 3
+      image(shipImg, rectX, rectY, scaledWidth, scaledHeight);
+
+      t += 0.03; // Decrease the increment value to slow down the movement of the wavy line
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      dynamicText.position(windowWidth * 0.1, windowHeight * 0.1); // Reposition the dynamic text upon window resize
+    }
+
+    function changeDynamicText() {
+      dynamicTextIndex++;
+      if (dynamicTextIndex < dynamicTexts.length) {
+        dynamicText.html(dynamicTexts[dynamicTextIndex]);
+      } else {
+        dynamicText.remove();
+      }
+    }
+  </script>
+  <div class="overlay">
+    <!-- Add the elements you want to position above the canvas here -->
+  </div>
+</body>
+</html>
